@@ -35,7 +35,9 @@ type StateActor<'a, 'state>(initialState : 'state) as this =
             let! message = inbox.Receive()
 
             if this.IsShutdownMessage message then
-               return this.ProcessShutdown state message
+               let preShutdownState = this.PreShutdown state message
+               let shutdownState = this.ProcessShutdown preShutdownState message
+               this.PostShutdown shutdownState message
             else
                let newState = this.ProcessMessage state message
                return! looper newState
@@ -48,10 +50,22 @@ type StateActor<'a, 'state>(initialState : 'state) as this =
 
    (* Public methods *)
    /// <summary>
+   /// Protected call. Perform any pre-shutdown work given the state and message
+   /// </summary>
+   abstract member PreShutdown : 'state -> 'a -> 'state
+   default this.PreShutdown state _ = state
+
+   /// <summary>
    /// Protected call. Process any shutdown tasks prior to a full shutdown
    /// </summary>
-   abstract member ProcessShutdown : 'state -> 'a -> unit
-   default this.ProcessShutdown _ _ = ()
+   abstract member ProcessShutdown : 'state -> 'a -> 'state
+   default this.ProcessShutdown state _ = state
+
+   /// <summary>
+   /// Protected call. Perform any post-shutdown work given the state and message
+   /// </summary>
+   abstract member PostShutdown : 'state -> 'a -> unit
+   default this.PostShutdown state _ = ()
 
    /// <summary>
    /// Protected call. Process a message, given the state and the message
