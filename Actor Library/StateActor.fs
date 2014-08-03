@@ -27,57 +27,58 @@ namespace Actors
 open Microsoft.FSharp.Control
 
 [<AbstractClass>]
-type StateActor<'a, 'state>(initialState : 'state) as this =
+type StateActor<'a, 'state>(initialState : 'state) as this = 
+   
    (* Private methods *)
-   let actorLoop state (inbox : MailboxProcessor<'a>) =
-      let rec looper state =
-         async {
+   let actorLoop state (inbox : MailboxProcessor<'a>) = 
+      let rec looper state = 
+         async { 
             let! message = inbox.Receive()
-
-            if this.IsShutdownMessage message then
+            if this.IsShutdownMessage message then 
                let preShutdownState = this.PreShutdown state message
                let shutdownState = this.ProcessShutdown preShutdownState message
                this.PostShutdown shutdownState message
-            else
+            else 
                let newState = this.ProcessMessage state message
                return! looper newState
          }
-      
       looper state
-
+   
    (* Private fields *)
    let mailbox = MailboxProcessor.Start <| actorLoop initialState
-
+   
    (* Public methods *)
    /// <summary>
    /// Protected call. Perform any pre-shutdown work given the state and message
    /// </summary>
-   abstract member PreShutdown : 'state -> 'a -> 'state
-   default this.PreShutdown state _ = state
-
+   abstract PreShutdown : 'state -> 'a -> 'state
+   
+   override this.PreShutdown state _ = state
+   
    /// <summary>
    /// Protected call. Process any shutdown tasks prior to a full shutdown
    /// </summary>
-   abstract member ProcessShutdown : 'state -> 'a -> 'state
-   default this.ProcessShutdown state _ = state
-
+   abstract ProcessShutdown : 'state -> 'a -> 'state
+   
+   override this.ProcessShutdown state _ = state
+   
    /// <summary>
    /// Protected call. Perform any post-shutdown work given the state and message
    /// </summary>
-   abstract member PostShutdown : 'state -> 'a -> unit
-   default this.PostShutdown state _ = ()
-
+   abstract PostShutdown : 'state -> 'a -> unit
+   
+   override this.PostShutdown state _ = ()
+   
    /// <summary>
    /// Protected call. Process a message, given the state and the message
    /// </summary>
-   abstract member ProcessMessage : 'state -> 'a -> 'state
-
+   abstract ProcessMessage : 'state -> 'a -> 'state
+   
    /// <summary>
    /// Protected call. Determines whether or not a message passed is instructing
    /// this actor to shutdown
    /// </summary>
-   abstract member IsShutdownMessage : 'a -> bool
-
+   abstract IsShutdownMessage : 'a -> bool
+   
    interface IActor<'a> with
       member this.Post msg = mailbox.Post msg
-   end

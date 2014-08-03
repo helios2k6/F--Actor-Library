@@ -27,12 +27,13 @@ namespace Actors
 /// <summary>
 /// The Null Actor. It can accept any message, but will never return a message
 /// </summary>
-type NullActor private () =
+type NullActor private () = 
+   
    interface IActor<obj> with
       member this.Post _ = ()
-   end
-
+   
    /// <summary>
    /// The one and only instance of the Null Actor
    /// </summary>
    static member public Instance = new NullActor()
+

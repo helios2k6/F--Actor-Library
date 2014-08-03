@@ -27,13 +27,13 @@ namespace Actors
 /// <summary>
 /// Represents an actor object
 /// </summary>
-type IActor<'a> =
+type IActor<'a> = 
    /// <summary>
    /// Post a message to an actor
    /// </summary>
-   abstract member Post : 'a -> unit
+   abstract Post : 'a -> unit
 
-module public ActorOperations =
+module public ActorOperations = 
    /// <summary>
    /// Convenience operator for posting messages to an IActor
    /// </summary>

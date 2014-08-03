@@ -30,15 +30,15 @@ namespace Actors
 type Stateless = NoState
 
 [<AbstractClass>]
-type StatelessActor<'a>() =
+type StatelessActor<'a>() = 
    inherit StateActor<'a, Stateless>(NoState)
-
+   
    (* Public methods *)
    /// <summary>
    /// Protected call. Process the message
    /// </summary>
-   abstract member ProcessStatelessMessage : 'a -> unit
-
-   override this.ProcessMessage _ msg =
+   abstract ProcessStatelessMessage : 'a -> unit
+   
+   override this.ProcessMessage _ msg = 
       this.ProcessStatelessMessage msg
       NoState
