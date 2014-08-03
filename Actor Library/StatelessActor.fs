@@ -24,46 +24,21 @@
 
 namespace Actors
 
-open Microsoft.FSharp.Control
+/// <summary>
+/// A placeholder type for the Stateless actor
+/// </summary>
+type Stateless = NoState
 
 [<AbstractClass>]
-type StateActor<'a, 'state>(initialState : 'state) as this =
-   (* Private methods *)
-   let actorLoop state (inbox : MailboxProcessor<'a>) =
-      let rec looper state =
-         async {
-            let! message = inbox.Receive()
-
-            if this.IsShutdownMessage message then
-               return this.ProcessShutdown state
-            else
-               let newState = this.ProcessMessage state message
-               return! looper newState
-         }
-      
-      looper state
-
-   (* Private fields *)
-   let mailbox = MailboxProcessor.Start <| actorLoop initialState
+type StatelessActor<'a>() =
+   inherit StateActor<'a, Stateless>(NoState)
 
    (* Public methods *)
    /// <summary>
-   /// Protected call. Process any shutdown tasks prior to a full shutdown
+   /// Protected call. Process the message
    /// </summary>
-   abstract member ProcessShutdown : 'state -> unit
-   default this.ProcessShutdown _ = ()
+   abstract member ProcessStatelessMessage : 'a -> unit
 
-   /// <summary>
-   /// Protected call. Process a message, given the state and the message
-   /// </summary>
-   abstract member ProcessMessage : 'state -> 'a -> 'state
-
-   /// <summary>
-   /// Protected call. Determines whether or not a message passed is instructing
-   /// this actor to shutdown
-   /// </summary>
-   abstract member IsShutdownMessage : 'a -> bool
-
-   interface IActor<'a> with
-      member this.Post msg = mailbox.Post msg
-   end
+   override this.ProcessMessage _ msg =
+      this.ProcessStatelessMessage msg
+      NoState

@@ -55,6 +55,7 @@
     <Compile Include="IActor.fs" />
     <Compile Include="NullActor.fs" />
     <Compile Include="StateActor.fs" />
+    <Compile Include="StatelessActor.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
