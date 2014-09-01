@@ -28,7 +28,6 @@ open Microsoft.FSharp.Control
 
 [<AbstractClass>]
 type StateActor<'a, 'state>(initialState : 'state) as this = 
-   
    (* Private methods *)
    let actorLoop state (inbox : MailboxProcessor<'a>) = 
       let rec looper state = 
@@ -52,21 +51,18 @@ type StateActor<'a, 'state>(initialState : 'state) as this =
    /// Protected call. Perform any pre-shutdown work given the state and message
    /// </summary>
    abstract PreShutdown : 'state -> 'a -> 'state
-   
    override this.PreShutdown state _ = state
    
    /// <summary>
    /// Protected call. Process any shutdown tasks prior to a full shutdown
    /// </summary>
    abstract ProcessShutdown : 'state -> 'a -> 'state
-   
    override this.ProcessShutdown state _ = state
    
    /// <summary>
    /// Protected call. Perform any post-shutdown work given the state and message
    /// </summary>
    abstract PostShutdown : 'state -> 'a -> unit
-   
    override this.PostShutdown state _ = ()
    
    /// <summary>
